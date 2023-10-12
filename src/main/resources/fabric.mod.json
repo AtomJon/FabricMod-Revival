@@ -1,0 +1,44 @@
+{
+	"schemaVersion": 1,
+	"id": "revivals",
+	"version": "${version}",
+	"name": "Revivals",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/revivals/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"lassevkp.revivals.Revivals"
+		],
+		"client": [
+			"lassevkp.revivals.RevivalsClient"
+		],
+		"fabric-datagen": [
+			"lassevkp.revivals.RevivalsDataGenerator"
+		]
+	},
+	"mixins": [
+		"revivals.mixins.json",
+		{
+			"config": "revivals.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.14.23",
+		"minecraft": "~1.20.2",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
