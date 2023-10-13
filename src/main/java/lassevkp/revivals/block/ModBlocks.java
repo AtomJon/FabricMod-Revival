@@ -1,11 +1,14 @@
 package lassevkp.revivals.block;
 
 import lassevkp.revivals.Revivals;
+import lassevkp.revivals.blockEntity.RitualTableEntity;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.LecternBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -19,7 +22,9 @@ public class ModBlocks {
             new Block(FabricBlockSettings.copyOf(Blocks.STONE).sounds(BlockSoundGroup.ANCIENT_DEBRIS)));
 
     public static final Block RITUAL_TABLE = registerBlock("ritual_table",
-            new RitualTable(FabricBlockSettings.create()));
+            new RitualTableBlock(FabricBlockSettings.create()));
+    public static final BlockEntity RITUAL_TABLE_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(Revivals.MOD_ID, "ritual_table"),
+            FabricBlockEntityTypeBuilder.create(RitualTableEntity::new, RITUAL_TABLE).build(null));
 
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);
