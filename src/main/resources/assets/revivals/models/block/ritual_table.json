@@ -1,0 +1,11 @@
+{
+  "parent": "block/lectern",
+  "textures": {
+    "particle": "revivals:block/ritual_table_sides",
+    "bottom": "revivals:block/ritual_table_bottom",
+    "base": "revivals:block/ritual_table_base",
+    "front": "revivals:block/ritual_table_front",
+    "sides": "revivals:block/ritual_table_sides",
+    "top": "revivals:block/ritual_table_top"
+  }
+}

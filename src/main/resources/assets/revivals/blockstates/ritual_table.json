@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "revivals:block/ritual_table",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "revivals:block/ritual_table"
+    },
+    "facing=south": {
+      "model": "revivals:block/ritual_table",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "revivals:block/ritual_table",
+      "y": 270
+    }
+  }
+}
