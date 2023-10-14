@@ -26,7 +26,7 @@ public class ModItems {
                     .icon(() -> new ItemStack(ModItems.RESURRECTION_TOTEM))
                     .entries((displayContext, entries) -> {
                         entries.add(RESURRECTION_TOTEM);
-                        entries.add(ModBlocks.COOL_BLOCK);
+                        entries.add(ModBlocks.RITUAL_TABLE);
                     }).build());
 
 

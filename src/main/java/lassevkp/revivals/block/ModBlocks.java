@@ -15,9 +15,6 @@ import net.minecraft.util.Identifier;
 
 public class ModBlocks {
 
-    public static final Block COOL_BLOCK = registerBlock("cool_block",
-            new Block(FabricBlockSettings.copyOf(Blocks.STONE).sounds(BlockSoundGroup.ANCIENT_DEBRIS)));
-
     public static final Block RITUAL_TABLE = registerBlock("ritual_table",
             new RitualTable(FabricBlockSettings.create()));
 
