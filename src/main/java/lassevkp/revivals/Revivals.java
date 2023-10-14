@@ -1,14 +1,10 @@
 package lassevkp.revivals;
 
 import lassevkp.revivals.block.ModBlocks;
+import lassevkp.revivals.block.entity.ModBlockEntities;
 import lassevkp.revivals.item.ModItems;
+import lassevkp.revivals.screen.ModScreenHandlers;
 import net.fabricmc.api.ModInitializer;
-
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +18,8 @@ public class Revivals implements ModInitializer {
 
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();
+		ModBlockEntities.registerBlockEntities();
+		ModScreenHandlers.registerAllScreenHandlers();
 
 		LOGGER.info("Revivals is initialized! =D");
 	}

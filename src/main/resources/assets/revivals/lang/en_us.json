@@ -4,5 +4,7 @@
   "block.revivals.cool_block": "Cool Block",
   "block.revivals.ritual_table": "Ritual Table",
 
-  "itemgroup.revivals": "Revivals"
+  "itemgroup.revivals": "Revivals",
+
+  "gui.ritual_table": "Ritual Table"
 }

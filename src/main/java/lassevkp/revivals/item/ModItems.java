@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 public class ModItems {
 
 
-    public static final Item RESURRECTION_TOTEM = registerItem("resurrection_totem", new Item(new FabricItemSettings()));
+    public static final Item RESURRECTION_TOTEM = registerItem("resurrection_totem", new Item(new FabricItemSettings().maxCount(1)));
 
     public static final ItemGroup MOD_GROUP = Registry.register(Registries.ITEM_GROUP,
             new Identifier(Revivals.MOD_ID, "revivals"),
