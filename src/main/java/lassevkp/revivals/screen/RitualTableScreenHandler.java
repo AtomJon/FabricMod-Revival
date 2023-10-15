@@ -27,7 +27,7 @@ public class RitualTableScreenHandler extends ScreenHandler {
         inventory.onOpen(playerInventory.player);
         this.propertyDelegate = delegate;
 
-        this.addSlot(new Slot(inventory, 0, 86, 60));
+        this.addSlot(new Slot(inventory, 0, 120, 26));
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
