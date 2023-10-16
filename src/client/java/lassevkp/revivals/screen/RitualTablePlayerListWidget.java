@@ -22,8 +22,7 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         this.update(collection, 0.0);
     }
 
-    public void update(Collection<UUID> uuids, double scrollAmount){ // Doesn't update
-        Revivals.LOGGER.info("updating");
+    public void update(Collection<UUID> uuids, double scrollAmount){
         HashMap<UUID, RitualTablePlayerListEntry> map = new HashMap<>();
         this.setPlayers(uuids, map);
         this.refresh(map.values(), scrollAmount);
