@@ -1,6 +1,5 @@
 package lassevkp.revivals.screen;
 
-import lassevkp.revivals.Revivals;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
@@ -24,9 +23,6 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
     public static final int LIGHT_GRAY_COLOR = ColorHelper.Argb.getArgb((int)140, (int)255, (int)255, (int)255);
     public static final int WHITE_COLOR = ColorHelper.Argb.getArgb((int)255, (int)255, (int)255, (int)255);
     private boolean hovered;
-
-
-
 
     public RitualTablePlayerListEntry(MinecraftClient client, RitualTableScreen parent, UUID uuid, String name, Supplier<SkinTextures> skinTexture){
         this.client = client;

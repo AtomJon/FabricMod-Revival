@@ -6,6 +6,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -54,4 +56,13 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            System.out.println("Left-Click");
+        } else if (button == 1) {
+            System.out.println("Right-Click");
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
 }
