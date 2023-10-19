@@ -3,11 +3,11 @@ package lassevkp.revivals.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import lassevkp.revivals.Revivals;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -15,8 +15,18 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
     private static final Identifier TEXTURE = new Identifier(Revivals.MOD_ID, "textures/gui/ritual_table_gui.png");
     RitualTablePlayerListWidget playerList;
 
+    ResurrectButtonWidget resurrectButton;
+
+    ButtonWidget.PressAction buttonAction = (ButtonWidget buttonWidget) -> {
+        Revivals.LOGGER.info("testt");
+    };
+
     public RitualTableScreen(RitualTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+    }
+
+    public void pressResurrectButton(){
+
     }
 
     private int getScreenHeight() {
@@ -32,8 +42,12 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
     protected void init() {
         super.init();
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
-        System.out.println(350-this.height/2); // The cutoff for players are bad if you resize the windows
         this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 41, this.getPlayerListBottom()+105-this.height/2, 24);
+        this.resurrectButton = new ResurrectButtonWidget((int) (0.507*this.width), (int) (0.38*this.height),75,15,
+                new ButtonTextures(Identifier.of("minecraft", "widget/button"),
+                        Identifier.of("minecraft", "widget/button_disabled"),
+                        Identifier.of("minecraft", "widget/button_highlighted")),
+                buttonAction);
     }
 
     @Override
@@ -53,6 +67,7 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         if (!this.playerList.isEmpty()) {
             this.playerList.render(context, mouseX, mouseY, delta);
         }
+        this.resurrectButton.render(context, mouseX, mouseY, delta);
         drawMouseoverTooltip(context, mouseX, mouseY);
     }
 
@@ -65,4 +80,5 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
 }

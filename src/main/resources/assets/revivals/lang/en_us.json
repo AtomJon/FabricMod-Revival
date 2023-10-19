@@ -6,5 +6,6 @@
 
   "itemgroup.revivals": "Revivals",
 
-  "gui.ritual_table": "Ritual Table"
+  "gui.ritual_table": "Ritual Table",
+  "gui.resurrect_button": "Resurrect"
 }

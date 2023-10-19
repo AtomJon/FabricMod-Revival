@@ -17,7 +17,8 @@ public class RitualTableScreenHandler extends ScreenHandler {
     private final PropertyDelegate propertyDelegate;
 
     public RitualTableScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(1), new ArrayPropertyDelegate(2));
+        this(syncId, inventory, new SimpleInventory(1), new ArrayPropertyDelegate(0));
+
     }
 
     public RitualTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate) {
