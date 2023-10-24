@@ -1,6 +1,5 @@
 package lassevkp.revivals.screen;
 
-import lassevkp.revivals.Revivals;
 import lassevkp.revivals.item.ModItems;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

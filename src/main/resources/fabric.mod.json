@@ -5,7 +5,8 @@
 	"name": "Revivals",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Me!"
+		"Lasse_VKP",
+		"AtomJon"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -20,9 +21,6 @@
 		],
 		"client": [
 			"lassevkp.revivals.RevivalsClient"
-		],
-		"fabric-datagen": [
-			"lassevkp.revivals.RevivalsDataGenerator"
 		]
 	},
 	"mixins": [
