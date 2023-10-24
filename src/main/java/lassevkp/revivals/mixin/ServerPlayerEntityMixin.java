@@ -1,7 +1,7 @@
 package lassevkp.revivals.mixin;
 
 import lassevkp.revivals.Revivals;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import lassevkp.revivals.common.HasRevivalsDeadState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,8 +23,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,24 +32,28 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin implements ServerLivingEntityEvents.AllowDeath {
+public abstract class ServerPlayerEntityMixin implements HasRevivalsDeadState {
     @Shadow public abstract boolean changeGameMode(GameMode gameMode);
 
     @Shadow @Final public ServerPlayerInteractionManager interactionManager;
     @Shadow @Final public MinecraftServer server;
 
+    @Override
+    public boolean getRevivalsDeadState(){
+        return revivalsDeadMode;
+    }
+
     @Unique
     private boolean revivalsDeadMode;
 
-    @Unique
+    /*@Unique
     public boolean getRevivalsDeadMode() {
         return this.revivalsDeadMode;
-    }
+    }*/
 
     @Unique
     public void enableRevivalsDeadMode() {
         this.revivalsDeadMode = true;
-        Revivals.LOGGER.info("Fucking dead man, stupid");
         this.changeGameMode(GameMode.SPECTATOR);
 
     }
