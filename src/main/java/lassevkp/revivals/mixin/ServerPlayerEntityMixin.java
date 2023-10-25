@@ -55,7 +55,6 @@ public abstract class ServerPlayerEntityMixin implements HasRevivalsDeadState {
     public void enableRevivalsDeadMode() {
         this.revivalsDeadMode = true;
         this.changeGameMode(GameMode.SPECTATOR);
-
     }
 
     @Unique
@@ -66,80 +65,9 @@ public abstract class ServerPlayerEntityMixin implements HasRevivalsDeadState {
 
 
     @Inject(method="onDeath",at=@At("HEAD"),cancellable = true)
-    private void onDeath(DamageSource damageSource, CallbackInfo ci){
-        if(!this.server.isHardcore() || this.interactionManager.getGameMode() != GameMode.SURVIVAL) return;
-        try {
-            Method onKilledBy = LivingEntity.class.getDeclaredMethod("onKilledBy", LivingEntity.class);
-            onKilledBy.setAccessible(true);
+    private void onDeath(DamageSource damageSource, CallbackInfo ci) {
+        if (!this.server.isHardcore() || this.interactionManager.getGameMode() != GameMode.SURVIVAL) return;
 
-            Method drop = LivingEntity.class.getDeclaredMethod("drop", DamageSource.class);
-            drop.setAccessible(true);
-
-            Method dropShoulderEntities = PlayerEntity.class.getDeclaredMethod("dropShoulderEntities");
-            dropShoulderEntities.setAccessible(true);
-
-            Method forgiveMobAnger = ServerPlayerEntity.class.getDeclaredMethod("forgiveMobAnger");
-            forgiveMobAnger.setAccessible(true);
-
-            Field scoreAmount = LivingEntity.class.getDeclaredField("scoreAmount");
-            scoreAmount.setAccessible(true);
-
-            ServerPlayerEntity e = (ServerPlayerEntity) (Object) this;
-
-            e.setHealth(20.0f);
-
-            e.emitGameEvent(GameEvent.ENTITY_DIE);
-            boolean bl = e.getWorld().getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES);
-            if (bl) {
-                Text text = e.getDamageTracker().getDeathMessage();
-                AbstractTeam abstractTeam = e.getScoreboardTeam();
-                if (abstractTeam != null && abstractTeam.getDeathMessageVisibilityRule() != AbstractTeam.VisibilityRule.ALWAYS) {
-                    if (abstractTeam.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS) {
-                        this.server.getPlayerManager().sendToTeam(e, text);
-                    } else if (abstractTeam.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM) {
-                        this.server.getPlayerManager().sendToOtherTeams(e, text);
-                    }
-                } else {
-                    this.server.getPlayerManager().broadcast(text, false);
-                }
-            } else {
-                e.networkHandler.sendPacket(new DeathMessageS2CPacket(e.getId(), ScreenTexts.EMPTY));
-            }
-
-            dropShoulderEntities.invoke(this);
-            if (e.getWorld().getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)) {
-                forgiveMobAnger.invoke(this);
-            }
-
-            if (!e.isSpectator()) {
-                drop.invoke(this,damageSource);
-            }
-
-            e.getScoreboard().forEachScore(ScoreboardCriterion.DEATH_COUNT, e.getEntityName(), ScoreboardPlayerScore::incrementScore);
-            LivingEntity livingEntity = e.getPrimeAdversary();
-            if (livingEntity != null) {
-                e.incrementStat(Stats.KILLED_BY.getOrCreateStat(livingEntity.getType()));
-                livingEntity.updateKilledAdvancementCriterion(e, (int) scoreAmount.get(this), damageSource);
-                onKilledBy.invoke(this, livingEntity);
-            }
-
-            e.getWorld().sendEntityStatus(e, (byte)3);
-            e.incrementStat(Stats.DEATHS);
-            e.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_DEATH));
-            e.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST));
-            e.extinguish();
-            e.setFrozenTicks(0);
-            e.setOnFire(false);
-            e.getDamageTracker().update();
-            e.setLastDeathPos(Optional.of(GlobalPos.create(e.getWorld().getRegistryKey(), e.getBlockPos())));
-
-            enableRevivalsDeadMode();
-
-            ci.cancel();
-
-        } catch (Exception e) {
-            Revivals.LOGGER.error(e.toString());
-        }
     }
 
 }
