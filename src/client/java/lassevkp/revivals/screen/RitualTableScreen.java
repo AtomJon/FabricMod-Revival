@@ -33,17 +33,25 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         return Math.max(52, this.height - 128 - 16);
     }
 
-    private int getPlayerListBottom() {
-        return 40 + this.getScreenHeight() - 8;
-
+    private int getCenterX(){
+        return this.width/2;
     }
+
+    private int getCenterY(){
+        return this.height/2;
+    }
+
+    private int getMargin(int margin, int anchor, int height){
+        return anchor + (anchor * margin / (height/2));
+    }
+
 
     @Override
     protected void init() {
         super.init();
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
-        this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 41, this.getPlayerListBottom()+105-this.height/2, 24);
-        this.resurrectButton = new ResurrectButtonWidget((int) (0.507*this.width), (int) (0.38*this.height),75,15,
+        this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 41, getMargin(-7, getCenterY(), this.height), 24);
+        this.resurrectButton = new ResurrectButtonWidget(getMargin(3, getCenterX(), this.height), getMargin(-30, getCenterY(), this.height),75,15,
                 new ButtonTextures(Identifier.of("minecraft", "widget/button"),
                         Identifier.of("minecraft", "widget/button_disabled"),
                         Identifier.of("minecraft", "widget/button_highlighted")),
