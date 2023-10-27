@@ -3,6 +3,7 @@ package lassevkp.revivals.mixin;
 import lassevkp.revivals.StateSaverAndLoader;
 import lassevkp.revivals.common.HasRevivalsDeadState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,6 +35,9 @@ public abstract class PlayerEntityMixin implements HasRevivalsDeadState{
     @Inject(method = "tickMovement", at=@At("HEAD"), cancellable = true)
     public void tickMovement(CallbackInfo ci){
         PlayerEntity player = (PlayerEntity) (Object) this;
+
+
+        // If this is on the server
         if(player.getServer() != null){
             StateSaverAndLoader state = StateSaverAndLoader.getServerState(player.getServer());
 

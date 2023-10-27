@@ -3,28 +3,29 @@ package lassevkp.revivals;
 import lassevkp.revivals.block.ModBlocks;
 import lassevkp.revivals.block.entity.ModBlockEntities;
 import lassevkp.revivals.item.ModItems;
-import lassevkp.revivals.mixin.PlayerEntityMixin;
-import lassevkp.revivals.mixin.ServerPlayerEntityMixin;
 import lassevkp.revivals.screen.ModScreenHandlers;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.GameRules;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 public class Revivals implements ModInitializer {
 
 	public static final String MOD_ID = "revivals";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
-	public static DeadManager deadManager = new DeadManager();
+	public static final Identifier PLAYER_IS_DEAD = new Identifier(MOD_ID, "player_is_dead");
 
 	@Override
 	public void onInitialize() {
@@ -39,10 +40,8 @@ public class Revivals implements ModInitializer {
 		ServerLivingEntityEvents.ALLOW_DEATH.register(
 				(LivingEntity entity, DamageSource damageSource, float damageAmount) -> {
 
-					if (!(entity instanceof ServerPlayerEntity)) return true;
+					if (!(entity instanceof ServerPlayerEntity player)) return true;
 					//if (!entity.getServer().isHardcore()) return true;
-
-					ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
 					if (player.interactionManager.getGameMode() != GameMode.SURVIVAL) return true;
 
@@ -59,18 +58,28 @@ public class Revivals implements ModInitializer {
 						Revivals.LOGGER.error(e.toString());
 					}
 
-					player.getUuid();
+					UUID playerUuid = player.getUuid();
 
-					StateSaverAndLoader state = StateSaverAndLoader.getServerState(player.getServer());
+
+					MinecraftServer server = player.getServer();
+					assert server != null;
+
+					StateSaverAndLoader state = StateSaverAndLoader.getServerState(server);
 
 					state.deadPlayers.add(player.getUuid());
 
-					GameRules gamerules = player.getWorld().getGameRules();
+					// Send a packet to the client
+					PacketByteBuf data = PacketByteBufs.create();
+					data.writeUuid(playerUuid);
 
+                    ServerPlayerEntity playerEntity = server.getPlayerManager().getPlayer(player.getUuid());
+					assert playerEntity != null;
 
-					return false;
+					server.execute(() ->
+                        ServerPlayNetworking.send(playerEntity, PLAYER_IS_DEAD, data)
+					);
 
-
+                    return false;
 				}
 		);
 

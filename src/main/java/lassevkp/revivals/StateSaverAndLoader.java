@@ -6,7 +6,6 @@ import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.logging.log4j.core.config.plugins.convert.TypeConverters;
 
 import java.util.ArrayList;
 import java.util.List;
