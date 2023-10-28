@@ -2,6 +2,7 @@ package lassevkp.revivals.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import lassevkp.revivals.Revivals;
+import lassevkp.revivals.block.entity.RitualTableBlockEntity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -16,7 +17,6 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
     private static final Identifier TEXTURE = new Identifier(Revivals.MOD_ID, "textures/gui/ritual_table_gui.png");
     private RitualTablePlayerListEntry selected;
     RitualTablePlayerListWidget playerList;
-
     ResurrectButtonWidget resurrectButton;
 
     public RitualTableScreen(RitualTableScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -46,13 +46,15 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
         this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 41, getMargin(-7, getCenterY(), this.height), 24);
         this.resurrectButton = new ResurrectButtonWidget(getMargin(2, getCenterX(), this.height), getMargin(-30, getCenterY(), this.height),75,16,
-                new ButtonTextures(Identifier.of("minecraft", "widget/button"),
-                        Identifier.of("minecraft", "widget/button_disabled"),
-                        Identifier.of("minecraft", "widget/button_highlighted")),
+                new ButtonTextures(Identifier.of("revivals", "container/ritual_table/button"),
+                        Identifier.of("revivals", "container/ritual_table/button_disabled"),
+                        Identifier.of("revivals", "container/ritual_table/button_highlighted")),
                 button -> {
             this.revive();
                 }, client);
+        this.resurrectButton.active = false;
         addSelectableChild(this.resurrectButton);
+
     }
 
     @Override
@@ -82,6 +84,7 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
             RitualTablePlayerListEntry hovered = playerList.getHoveredEntry((int) mouseX, (int) mouseY);
             if(hovered != null){
                 this.selected = hovered;
+                this.resurrectButton.active = true;
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -93,12 +96,8 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
 
     private void revive(){
         if(selected != null){
-            System.out.println("Reviving");
-            UUID reviveeUUID = selected.getUuid();
-            UUID tableUserUUID = client.player.getUuid();
-
-            // Send revive information (Also check if player is already alive and online)
-            // tableUserUUID is used for when making a message of who revived reviveeUUID
+            UUID targetUUID = selected.getUuid();
+            this.getScreenHandler().tryRevive(targetUUID, this.client.player.getUuid());
         }
     }
 

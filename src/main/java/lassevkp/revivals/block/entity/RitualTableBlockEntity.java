@@ -1,5 +1,6 @@
 package lassevkp.revivals.block.entity;
 
+import lassevkp.revivals.StateSaverAndLoader;
 import lassevkp.revivals.item.ModItems;
 import lassevkp.revivals.screen.RitualTableScreenHandler;
 import net.minecraft.block.BlockState;
@@ -12,10 +13,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
 
 public class RitualTableBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory =
@@ -69,16 +73,23 @@ public class RitualTableBlockEntity extends BlockEntity implements NamedScreenHa
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new RitualTableScreenHandler(syncId, playerInventory, this, this.propertyDelegate);
+        return new RitualTableScreenHandler(syncId, playerInventory, this, this.propertyDelegate, ScreenHandlerContext.create(this.world, this.pos));
     }
 
-    public static void useTotem(RitualTableBlockEntity entity) {
-        entity.removeStack(1);
+    public void tryUseTotem(UUID targetUUID, UUID playerUUID) {
+        if(hasTotem()){
+            StateSaverAndLoader state = StateSaverAndLoader.getServerState(this.getWorld().getServer());
+            if(state.deadPlayers.contains(targetUUID)){
+
+                this.getWorld().getServer().sendMessage(Text.literal("Peneesus"));
+                // DO thingies here
+                this.removeStack(1, 1);
+            }
+        }
     }
 
-    private static boolean hasTotem(RitualTableBlockEntity entity) {
-
-        return entity.getStack(1).getItem() == ModItems.RESURRECTION_TOTEM;
+    private boolean hasTotem() {
+        return this.getStack(1).getItem() == ModItems.RESURRECTION_TOTEM;
     }
 
 }
