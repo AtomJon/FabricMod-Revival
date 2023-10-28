@@ -1,11 +1,12 @@
 package lassevkp.revivals.screen;
 
 import com.google.common.collect.Lists;
-import lassevkp.revivals.Revivals;
+import lassevkp.revivals.StateSaverAndLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.server.MinecraftServer;
 
 import java.util.*;
 
@@ -18,7 +19,12 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         this.parent = parent;
         this.setRenderBackground(false);
 
-        Collection<UUID> collection = this.client.player.networkHandler.getPlayerUuids();
+        MinecraftServer server = client.getServer();
+
+        StateSaverAndLoader state = StateSaverAndLoader.getServerState(server);
+
+        Collection<UUID> collection = new ArrayList<>(state.deadPlayers);
+
         this.update(collection, 0.0);
     }
 
@@ -48,15 +54,10 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         }).thenComparing(RitualTablePlayerListEntry::getName, String::compareToIgnoreCase));
     }
 
-    private void filterPlayers() {
-        // Remove alive players
-    }
-
     private void refresh(Collection<RitualTablePlayerListEntry> players, double scrollAmount) {
         this.players.clear();
         this.players.addAll(players);
         this.sortPlayers();
-        this.filterPlayers();
         this.replaceEntries(this.players);
         this.setScrollAmount(scrollAmount);
     }
@@ -89,4 +90,19 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
     protected int getRowBottom(int index) {
         return super.getRowBottom(index);
     }
+
+    protected RitualTablePlayerListEntry getHoveredEntry(int mouseX, int mouseY){
+        for (RitualTablePlayerListEntry entry: this.children()) {
+            int entryX = entry.getX();
+            int entryY = entry.getY();
+            int entryWidth = entry.getWidth();
+            int entryHeight = entry.getHeight();
+            if(mouseX >= entryX && mouseY >= entryY && mouseX < entryX + entryWidth && mouseY < entryY + entryHeight){
+                return entry;
+            }
+        }
+        return null;
+    }
+
+
 }

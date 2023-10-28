@@ -24,6 +24,11 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
     public static final int WHITE_COLOR = ColorHelper.Argb.getArgb((int)255, (int)255, (int)255, (int)255);
     private boolean hovered;
 
+    private int y;
+    private int x;
+    private int width;
+    private int height;
+
     public RitualTablePlayerListEntry(MinecraftClient client, RitualTableScreen parent, UUID uuid, String name, Supplier<SkinTextures> skinTexture){
         this.client = client;
         this.uuid = uuid;
@@ -54,14 +59,38 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
         return this.skinSupplier;
     }
 
+    public int getY(){
+        return this.y;
+    }
+
+    public int getX(){
+        return this.x;
+    }
+
+    public int getWidth(){
+        return this.width;
+    }
+
+    public int getHeight(){
+        return this.height;
+    }
+
     @Override
     public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        this.y = y;
+        this.x = x;
+        this.width = entryWidth;
+        this.height = entryHeight;
+
         int l; // Text y value
         int i = x + 4; // Head x value
         int j = y + (entryHeight - 12) / 2; // Head y value
         int k = i + 12 + 4; // Text x Value
+
         this.hovered = mouseX >= x && mouseY >= y && mouseX < x + entryWidth && mouseY < y + entryHeight;
-        if(this.hovered) {
+        if (this.parent.getSelected() == this) {
+            context.fill(x, y, x + entryWidth, y + entryHeight, WHITE_COLOR);
+        } else if(this.hovered) {
             context.fill(x, y, x + entryWidth, y + entryHeight, LIGHT_GRAY_COLOR);
         } else {
             context.fill(x, y, x + entryWidth, y + entryHeight, GRAY_COLOR);
@@ -70,4 +99,5 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
         PlayerSkinDrawer.draw(context, this.skinSupplier.get(), i, j, 12);
         context.drawText(this.client.textRenderer, this.name, k, l, WHITE_COLOR, false);
     }
+
 }

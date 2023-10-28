@@ -7,5 +7,5 @@
   "itemgroup.revivals": "Revivals",
 
   "gui.ritual_table": "Ritual Table",
-  "gui.resurrect_button": "Resurrect"
+  "gui.ritual_table.resurrect_button": "Resurrect"
 }
