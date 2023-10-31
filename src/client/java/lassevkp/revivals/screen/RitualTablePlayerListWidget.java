@@ -1,7 +1,7 @@
 package lassevkp.revivals.screen;
 
 import com.google.common.collect.Lists;
-import lassevkp.revivals.StateSaverAndLoader;
+import lassevkp.revivals.PersistentPlayerList.PersistentDeadPlayerList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -21,9 +21,10 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
 
         MinecraftServer server = client.getServer();
 
-        StateSaverAndLoader state = StateSaverAndLoader.getServerState(server);
+        assert server != null;
+        PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(server);
 
-        Collection<UUID> collection = new ArrayList<>(state.deadPlayers);
+        Collection<UUID> collection = state.getDeadPlayers();
 
         this.update(collection, 0.0);
     }
