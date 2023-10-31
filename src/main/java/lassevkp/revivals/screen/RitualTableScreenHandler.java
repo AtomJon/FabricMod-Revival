@@ -1,12 +1,8 @@
 package lassevkp.revivals.screen;
 
+import lassevkp.revivals.PersistentPlayerList.PersistentDeadPlayerList;
 import lassevkp.revivals.Revivals;
-import lassevkp.revivals.StateSaverAndLoader;
-import lassevkp.revivals.block.entity.RitualTableBlockEntity;
 import lassevkp.revivals.item.ModItems;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.block.Block;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,11 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.DefaultParticleType;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
@@ -29,19 +21,15 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 public class RitualTableScreenHandler extends ScreenHandler {
     private final Inventory inventory;
@@ -124,14 +112,14 @@ public class RitualTableScreenHandler extends ScreenHandler {
             Optional<World> worldOptional = this.context.get((world, blockPos) -> world);
             ServerWorld world = (ServerWorld) worldOptional.get();
             MinecraftServer server = world.getServer();
-            StateSaverAndLoader state = StateSaverAndLoader.getServerState(server);
+            PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(server);
 
-            if(state.deadPlayers.contains(targetUUID)){
+            if(state.getDeadPlayers().contains(targetUUID)){
 
                 Revivals.LOGGER.info("Checks succeeded, reviving player with uuid " + targetUUID.toString());
 
                 // Remove players from the deadPlayers list
-                state.deadPlayers.remove(targetUUID);
+                state.setPlayerNotDead(targetUUID);
 
                 // Remove the totem used
                 this.getSlot(0).takeStack(1);

@@ -1,6 +1,6 @@
 package lassevkp.revivals.block.entity;
 
-import lassevkp.revivals.StateSaverAndLoader;
+import lassevkp.revivals.PersistentPlayerList.PersistentDeadPlayerList;
 import lassevkp.revivals.item.ModItems;
 import lassevkp.revivals.screen.RitualTableScreenHandler;
 import net.minecraft.block.BlockState;
@@ -78,8 +78,8 @@ public class RitualTableBlockEntity extends BlockEntity implements NamedScreenHa
 
     public void tryUseTotem(UUID targetUUID, UUID playerUUID) {
         if(hasTotem()){
-            StateSaverAndLoader state = StateSaverAndLoader.getServerState(this.getWorld().getServer());
-            if(state.deadPlayers.contains(targetUUID)){
+            PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(this.getWorld().getServer());
+            if(state.getDeadPlayers().contains(targetUUID)){
 
                 this.getWorld().getServer().sendMessage(Text.literal("Peneesus"));
                 // DO thingies here
