@@ -25,8 +25,8 @@ import java.util.UUID;
 public abstract class ClientPlayerEntityMixin {
     @Shadow @Final protected MinecraftClient client;
 
-    @Unique() boolean isDead = false;
-    @Unique() Vec3d positionOfDeath = Vec3d.ZERO;
+    @Unique() private static boolean isDead = false;
+    @Unique() private static Vec3d positionOfDeath = Vec3d.ZERO;
 
     @Unique
     boolean shouldNotMove()
