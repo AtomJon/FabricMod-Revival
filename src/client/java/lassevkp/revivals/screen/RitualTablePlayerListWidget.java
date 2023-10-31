@@ -19,7 +19,7 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         this.parent = parent;
         this.setRenderBackground(false);
 
-        MinecraftServer server = client.getServer();
+        MinecraftServer server = client.getServer(); // Find en måde at få server uden at det er integratedServer via client
 
         assert server != null;
         PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(server);

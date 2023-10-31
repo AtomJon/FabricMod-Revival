@@ -45,19 +45,19 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
 
     @Override
     protected void init() {
+        System.out.println("INIT()");
         super.init();
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
         this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 41, getMargin(-7, getCenterY(), this.height), 24);
         this.resurrectButton = new ResurrectButtonWidget(getMargin(2, getCenterX(), this.height), getMargin(-30, getCenterY(), this.height),75,16,
-                new ButtonTextures(Identifier.of("revivals", "container/ritual_table/button"),
-                        Identifier.of("revivals", "container/ritual_table/button_disabled"),
-                        Identifier.of("revivals", "container/ritual_table/button_highlighted")),
+                new ButtonTextures(new Identifier(Revivals.MOD_ID, "container/ritual_table/button"),
+                        new Identifier(Revivals.MOD_ID, "container/ritual_table/button_disabled"),
+                        new Identifier(Revivals.MOD_ID, "container/ritual_table/button_highlighted")),
                 button -> {
-            this.revive();
+                    this.revive();
                 }, client);
         this.resurrectButton.active = false;
         addSelectableChild(this.resurrectButton);
-
     }
 
     @Override
@@ -74,10 +74,12 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
-        if (!this.playerList.isEmpty()) {
-            this.playerList.render(context, mouseX, mouseY, delta);
+        if(this.playerList != null){
+            if (!this.playerList.isEmpty()) {
+                this.playerList.render(context, mouseX, mouseY, delta);
+            }
+            this.resurrectButton.render(context, mouseX, mouseY, delta);
         }
-        this.resurrectButton.render(context, mouseX, mouseY, delta);
         drawMouseoverTooltip(context, mouseX, mouseY);
     }
 

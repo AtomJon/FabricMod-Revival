@@ -16,9 +16,6 @@ import java.util.Observer;
 import java.util.UUID;
 
 public class RevivalsClient implements ClientModInitializer {
-	//public static Event clientPlayerDiedEventObserver = EventFactory.createArrayBacked(void.class, callbacks -> {
-
-	//});
 
 	@Override
 	public void onInitializeClient() {

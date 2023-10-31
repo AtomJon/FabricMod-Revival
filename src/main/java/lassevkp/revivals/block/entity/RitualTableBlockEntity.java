@@ -1,7 +1,5 @@
 package lassevkp.revivals.block.entity;
 
-import lassevkp.revivals.PersistentPlayerList.PersistentDeadPlayerList;
-import lassevkp.revivals.item.ModItems;
 import lassevkp.revivals.screen.RitualTableScreenHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -74,22 +72,6 @@ public class RitualTableBlockEntity extends BlockEntity implements NamedScreenHa
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         return new RitualTableScreenHandler(syncId, playerInventory, this, this.propertyDelegate, ScreenHandlerContext.create(this.world, this.pos));
-    }
-
-    public void tryUseTotem(UUID targetUUID, UUID playerUUID) {
-        if(hasTotem()){
-            PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(this.getWorld().getServer());
-            if(state.getDeadPlayers().contains(targetUUID)){
-
-                this.getWorld().getServer().sendMessage(Text.literal("Peneesus"));
-                // DO thingies here
-                this.removeStack(1, 1);
-            }
-        }
-    }
-
-    private boolean hasTotem() {
-        return this.getStack(1).getItem() == ModItems.RESURRECTION_TOTEM;
     }
 
 }
