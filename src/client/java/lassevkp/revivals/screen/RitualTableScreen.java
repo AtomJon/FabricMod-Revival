@@ -1,13 +1,16 @@
 package lassevkp.revivals.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import lassevkp.revivals.NetworkingConstants;
 import lassevkp.revivals.Revivals;
-import lassevkp.revivals.block.entity.RitualTableBlockEntity;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -96,8 +99,14 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
 
     private void revive(){
         if(selected != null){
+            // Create a packet with the target UUID
             UUID targetUUID = selected.getUuid();
-            this.getScreenHandler().tryRevive(targetUUID, this.client.player.getUuid());
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeUuid(targetUUID);
+
+            // Send packet and close screen
+            ClientPlayNetworking.send(NetworkingConstants.RESURRECT_PACKET_ID, buf);
+            RitualTableScreen.this.client.player.closeHandledScreen();
         }
     }
 

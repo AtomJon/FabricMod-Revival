@@ -1,20 +1,41 @@
 package lassevkp.revivals.screen;
 
+import lassevkp.revivals.Revivals;
+import lassevkp.revivals.StateSaverAndLoader;
 import lassevkp.revivals.block.entity.RitualTableBlockEntity;
 import lassevkp.revivals.item.ModItems;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Block;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
+import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockRenderView;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -96,14 +117,72 @@ public class RitualTableScreenHandler extends ScreenHandler {
         return this.getSlot(0).getStack().getItem() == ModItems.RESURRECTION_TOTEM;
     }
 
-    public void tryRevive(UUID targetUUID, UUID playerUUID){
-        System.out.println("Trying to revive");
-        if(hasTotem()){
-            this.getSlot(0).takeStack(1);
-            this.context.run(World::markDirty);
-            Optional<Object> pos = this.context.get((world, blockPos) -> blockPos);
+    public void tryRevive(UUID targetUUID, ServerPlayerEntity player) {
+        Revivals.LOGGER.info("Trying to revive player with uuid " + targetUUID.toString());
+        if (hasTotem()) {
 
-            System.out.println(pos);
+            Optional<World> worldOptional = this.context.get((world, blockPos) -> world);
+            ServerWorld world = (ServerWorld) worldOptional.get();
+            MinecraftServer server = world.getServer();
+            StateSaverAndLoader state = StateSaverAndLoader.getServerState(server);
+
+            if(state.deadPlayers.contains(targetUUID)){
+
+                Revivals.LOGGER.info("Checks succeeded, reviving player with uuid " + targetUUID.toString());
+
+                // Remove players from the deadPlayers list
+                state.deadPlayers.remove(targetUUID);
+
+                // Remove the totem used
+                this.getSlot(0).takeStack(1);
+                this.context.run(World::markDirty);
+
+                ServerPlayerEntity targetPlayer = server.getPlayerManager().getPlayer(targetUUID);
+
+                // Get the blockposition in a Vec3d
+                Optional<BlockPos> blockPosOptional = this.context.get((w, blockPos) -> blockPos);
+                BlockPos blockPos = blockPosOptional.get();
+                Vec3d pos = blockPos.add(0, 1, 0).toCenterPos();
+                targetPlayer.teleport(world, pos.x, pos.y, pos.z, 0.0f, 0.0f);
+
+
+                targetPlayer.changeGameMode(GameMode.SURVIVAL);
+
+                // Send a message to all players
+                Text text = Text.literal((targetPlayer.getDisplayName().getString() + " was revived by " + player.getDisplayName().getString()));
+                for (ServerPlayerEntity serverPlayer : server.getPlayerManager().getPlayerList()) {
+                    serverPlayer.sendMessage(text, false);
+                }
+
+                // Effects
+                targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 4));
+                targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 600, 0));
+
+
+                // Play sound and create particles
+                world.playSound(null, blockPos, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                ParticleS2CPacket particlePacket = new ParticleS2CPacket(
+                        ParticleTypes.TOTEM_OF_UNDYING,
+                        false,
+                        pos.x,
+                        pos.y,
+                        pos.z,
+                        0.0f,
+                        0.0f,
+                        0.0f,
+                        0.5f,
+                        100
+                );
+
+                // Display Particles
+                for (ServerPlayerEntity serverPlayer : world.getPlayers()) {
+                    // Check if the player is close enough to see the particles
+                    if (player.squaredDistanceTo(new Vec3d(pos.x, pos.y, pos.z)) < 64.0) {
+                        serverPlayer.networkHandler.sendPacket(particlePacket);
+                    }
+                }
+
+            }
 
         }
 

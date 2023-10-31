@@ -1,10 +1,15 @@
 package lassevkp.revivals;
 
+<<<<<<< Updated upstream
 import lassevkp.revivals.PersistentPlayerList.PersistentDeadPlayerList;
+=======
+import io.netty.channel.ChannelHandler;
+>>>>>>> Stashed changes
 import lassevkp.revivals.block.ModBlocks;
 import lassevkp.revivals.block.entity.ModBlockEntities;
 import lassevkp.revivals.item.ModItems;
 import lassevkp.revivals.screen.ModScreenHandlers;
+import lassevkp.revivals.screen.RitualTableScreenHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -17,6 +22,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -43,6 +49,7 @@ public class Revivals implements ModInitializer {
 				Revivals::AllowDeathEventListener
 		);
 
+<<<<<<< Updated upstream
 		ServerPlayConnectionEvents.JOIN.register(
 			Revivals::PlayerJoinedEventListener
 		);
@@ -111,5 +118,15 @@ public class Revivals implements ModInitializer {
 
 	private static void resetPlayerHealth(LivingEntity entity) {
 		entity.setHealth(20.0f);
+=======
+		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.RESURRECT_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+			if(player.currentScreenHandler instanceof RitualTableScreenHandler){
+				RitualTableScreenHandler ritualTableScreenHandler = (RitualTableScreenHandler) player.currentScreenHandler;
+				ritualTableScreenHandler.tryRevive(buf.readUuid(), player);
+
+			}
+		});
+
+>>>>>>> Stashed changes
 	}
 }
