@@ -14,7 +14,7 @@ public class ModScreenHandlers {
 
     public static void registerAllScreenHandlers(){
         //RITUAL_TABLE_SCREEN_HANDLER = new ScreenHandlerType<>(RitualTableScreenHandler::new, FeatureSet.empty());
-        RITUAL_TABLE_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(Revivals.MOD_ID, "ritual_table"), RitualTableScreenHandler::new);
+        RITUAL_TABLE_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier(Revivals.MOD_ID, "ritual_table"), RitualTableScreenHandler::new);
 
     }
 }

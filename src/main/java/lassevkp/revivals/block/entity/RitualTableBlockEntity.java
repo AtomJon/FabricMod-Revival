@@ -1,6 +1,8 @@
 package lassevkp.revivals.block.entity;
 
+import lassevkp.revivals.PersistentPlayerList.PersistentDeadPlayerList;
 import lassevkp.revivals.screen.RitualTableScreenHandler;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -8,18 +10,22 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.UUID;
 
-public class RitualTableBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
+public class RitualTableBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory =
             DefaultedList.ofSize(1, ItemStack.EMPTY);
 
@@ -74,4 +80,10 @@ public class RitualTableBlockEntity extends BlockEntity implements NamedScreenHa
         return new RitualTableScreenHandler(syncId, playerInventory, this, this.propertyDelegate, ScreenHandlerContext.create(this.world, this.pos));
     }
 
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(this.getWorld().getServer());
+        byte[] data = SerializationUtils.serialize((HashSet<UUID>) state.getDeadPlayers());
+        buf.writeByteArray(data);
+    }
 }

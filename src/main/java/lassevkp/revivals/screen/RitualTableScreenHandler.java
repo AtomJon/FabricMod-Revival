@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.ArrayPropertyDelegate;
@@ -27,7 +28,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.SerializationUtils;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,10 +39,11 @@ public class RitualTableScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final PropertyDelegate propertyDelegate;
     private final ScreenHandlerContext context;
+    private Collection<UUID> deadplayers;
 
-    public RitualTableScreenHandler(int syncId, PlayerInventory inventory) {
+    public RitualTableScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
         this(syncId, inventory, new SimpleInventory(1), new ArrayPropertyDelegate(0), ScreenHandlerContext.EMPTY);
-
+        this.deadplayers = SerializationUtils.deserialize(buf.readByteArray());
     }
 
     public RitualTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate, ScreenHandlerContext context) {
@@ -103,6 +108,10 @@ public class RitualTableScreenHandler extends ScreenHandler {
 
     private boolean hasTotem() {
         return this.getSlot(0).getStack().getItem() == ModItems.RESURRECTION_TOTEM;
+    }
+
+    public Collection<UUID> getDeadPlayers(){
+        return this.deadplayers;
     }
 
     public void tryRevive(UUID targetUUID, ServerPlayerEntity player) {
