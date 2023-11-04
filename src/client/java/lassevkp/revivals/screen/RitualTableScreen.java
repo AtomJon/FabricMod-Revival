@@ -42,13 +42,11 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         return anchor + (anchor * margin / (height/2));
     }
 
-
     @Override
     protected void init() {
-        System.out.println("INIT()");
         super.init();
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
-        this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 41, getMargin(-7, getCenterY(), this.height), 24);
+        this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 43, getMargin(-16, getCenterY(), this.height), 24);
         this.resurrectButton = new ResurrectButtonWidget(getMargin(2, getCenterX(), this.height), getMargin(-30, getCenterY(), this.height),75,16,
                 new ButtonTextures(new Identifier(Revivals.MOD_ID, "container/ritual_table/button"),
                         new Identifier(Revivals.MOD_ID, "container/ritual_table/button_disabled"),
@@ -100,7 +98,7 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
     }
 
     private void revive(){
-        if(selected != null){
+        if(selected != null && this.getScreenHandler().hasTotem()){
             // Create a packet with the target UUID
             UUID targetUUID = selected.getUuid();
             PacketByteBuf buf = PacketByteBufs.create();
@@ -112,5 +110,9 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         }
     }
 
-
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        this.playerList.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
 }

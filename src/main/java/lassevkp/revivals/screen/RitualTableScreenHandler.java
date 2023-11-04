@@ -106,7 +106,7 @@ public class RitualTableScreenHandler extends ScreenHandler {
         }
     }
 
-    private boolean hasTotem() {
+    public boolean hasTotem() {
         return this.getSlot(0).getStack().getItem() == ModItems.RESURRECTION_TOTEM;
     }
 

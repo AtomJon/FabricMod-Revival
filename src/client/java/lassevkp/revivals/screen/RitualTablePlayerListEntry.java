@@ -28,6 +28,7 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
     private int x;
     private int width;
     private int height;
+    private int yOffset = 0;
 
     public RitualTablePlayerListEntry(MinecraftClient client, RitualTableScreen parent, UUID uuid, String name, Supplier<SkinTextures> skinTexture){
         this.client = client;
@@ -55,16 +56,16 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
         return this.uuid;
     }
 
-    public Supplier<SkinTextures> getSkinSupplier() {
-        return this.skinSupplier;
-    }
-
     public int getY(){
         return this.y;
     }
 
     public int getX(){
         return this.x;
+    }
+
+    public void scrollY(double scrollAmount){
+        this.yOffset = (int) scrollAmount;
     }
 
     public int getWidth(){
@@ -77,27 +78,26 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
 
     @Override
     public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-        this.y = y;
+        this.y = y - this.yOffset;
         this.x = x;
         this.width = entryWidth;
         this.height = entryHeight;
 
         int l; // Text y value
         int i = x + 4; // Head x value
-        int j = y + (entryHeight - 12) / 2; // Head y value
+        int j = this.y + (entryHeight - 12) / 2; // Head y value
         int k = i + 12 + 4; // Text x Value
 
-        this.hovered = mouseX >= x && mouseY >= y && mouseX < x + entryWidth && mouseY < y + entryHeight;
+        this.hovered = mouseX >= x && mouseY >= this.y && mouseX < x + entryWidth && mouseY < this.y + entryHeight;
         if (this.parent.getSelected() == this) {
-            context.fill(x, y, x + entryWidth, y + entryHeight, WHITE_COLOR);
+            context.fill(x, this.y, x + entryWidth, this.y + entryHeight, WHITE_COLOR);
         } else if(this.hovered) {
-            context.fill(x, y, x + entryWidth, y + entryHeight, LIGHT_GRAY_COLOR);
+            context.fill(x, this.y, x + entryWidth, this.y + entryHeight, LIGHT_GRAY_COLOR);
         } else {
-            context.fill(x, y, x + entryWidth, y + entryHeight, GRAY_COLOR);
+            context.fill(x, this.y, x + entryWidth, this.y + entryHeight, GRAY_COLOR);
         }
-        l = y + (entryHeight - this.client.textRenderer.fontHeight) / 2;
+        l = this.y + (entryHeight - this.client.textRenderer.fontHeight) / 2;
         PlayerSkinDrawer.draw(context, this.skinSupplier.get(), i, j, 12);
         context.drawText(this.client.textRenderer, this.name, k, l, WHITE_COLOR, false);
     }
-
 }

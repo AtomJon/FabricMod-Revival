@@ -1,27 +1,26 @@
 package lassevkp.revivals.screen;
 
 import com.google.common.collect.Lists;
-import lassevkp.revivals.PersistentPlayerList.PersistentDeadPlayerList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.server.MinecraftServer;
 
 import java.util.*;
 
 public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePlayerListEntry> {
     private final RitualTableScreen parent;
     private final List<RitualTablePlayerListEntry> players = Lists.newArrayList();
+    private Collection<UUID> deadPlayers;
 
     public RitualTablePlayerListWidget(RitualTableScreen parent, MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
         super(client, width, height, top, bottom, itemHeight);
         this.parent = parent;
         this.setRenderBackground(false);
 
-        Collection<UUID> collection = parent.getScreenHandler().getDeadPlayers();
+        this.deadPlayers = parent.getScreenHandler().getDeadPlayers();
 
-        this.update(collection, 0.0);
+        this.update(this.deadPlayers, 0.0);
     }
 
     public void update(Collection<UUID> uuids, double scrollAmount){
@@ -55,7 +54,9 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         this.players.addAll(players);
         this.sortPlayers();
         this.replaceEntries(this.players);
-        this.setScrollAmount(scrollAmount);
+        for (RitualTablePlayerListEntry entry: this.children()){
+            entry.scrollY(scrollAmount);
+        }
     }
 
     public boolean isEmpty() {
@@ -88,6 +89,7 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
     }
 
     protected RitualTablePlayerListEntry getHoveredEntry(int mouseX, int mouseY){
+
         for (RitualTablePlayerListEntry entry: this.children()) {
             int entryX = entry.getX();
             int entryY = entry.getY();
@@ -100,5 +102,12 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         return null;
     }
 
-
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if(mouseY < this.bottom && mouseY >= this.top && mouseX >= this.getRowLeft() && mouseX < this.getRowRight()) {
+            this.setScrollAmount(this.getScrollAmount()-verticalAmount*4);
+            this.update(this.deadPlayers, this.getScrollAmount());
+        }
+        return false;
+    }
 }
