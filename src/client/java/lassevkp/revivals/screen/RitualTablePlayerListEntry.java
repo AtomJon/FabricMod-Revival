@@ -22,6 +22,7 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
     public static final int GRAY_COLOR = ColorHelper.Argb.getArgb((int)255, (int)74, (int)74, (int)74);
     public static final int LIGHT_GRAY_COLOR = ColorHelper.Argb.getArgb((int)140, (int)255, (int)255, (int)255);
     public static final int WHITE_COLOR = ColorHelper.Argb.getArgb((int)255, (int)255, (int)255, (int)255);
+    public static final int LIGHT_BLUE_COLOR = ColorHelper.Argb.getArgb((int)140, (int)136, (int)146, (int)201);
     private boolean hovered;
 
     private int y;
@@ -90,7 +91,7 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
 
         this.hovered = mouseX >= x && mouseY >= this.y && mouseX < x + entryWidth && mouseY < this.y + entryHeight;
         if (this.parent.getSelected() == this) {
-            context.fill(x, this.y, x + entryWidth, this.y + entryHeight, WHITE_COLOR);
+            context.fill(x, this.y, x + entryWidth, this.y + entryHeight, LIGHT_BLUE_COLOR);
         } else if(this.hovered) {
             context.fill(x, this.y, x + entryWidth, this.y + entryHeight, LIGHT_GRAY_COLOR);
         } else {

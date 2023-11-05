@@ -53,7 +53,9 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         this.players.clear();
         this.players.addAll(players);
         this.sortPlayers();
-        this.replaceEntries(this.players);
+        if(this.children().isEmpty()){
+            this.replaceEntries(this.players);
+        }
         for (RitualTablePlayerListEntry entry: this.children()){
             entry.scrollY(scrollAmount);
         }
