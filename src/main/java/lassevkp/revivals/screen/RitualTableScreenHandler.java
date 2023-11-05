@@ -122,59 +122,60 @@ public class RitualTableScreenHandler extends ScreenHandler {
             Optional<World> worldOptional = this.context.get((world, blockPos) -> world);
             ServerWorld world = (ServerWorld) worldOptional.get();
             MinecraftServer server = world.getServer();
-            PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(server);
+            ServerPlayerEntity targetPlayer = server.getPlayerManager().getPlayer(targetUUID);
 
-            if(state.getDeadPlayers().contains(targetUUID)){
+            if(targetPlayer != null){
+                PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(server);
+                if(state.getDeadPlayers().contains(targetUUID)){
 
-                Revivals.LOGGER.info("Checks succeeded, reviving player with uuid " + targetUUID.toString());
+                    Revivals.LOGGER.info("Checks succeeded, reviving player with uuid " + targetUUID.toString());
 
-                // Remove players from the deadPlayers list
-                state.setPlayerNotDead(targetUUID);
+                    // Remove players from the deadPlayers list
+                    state.setPlayerNotDead(targetUUID);
 
-                // Remove the totem used
-                this.getSlot(0).takeStack(1);
-                this.context.run(World::markDirty);
+                    // Remove the totem used
+                    this.getSlot(0).takeStack(1);
+                    this.context.run(World::markDirty);
 
-                ServerPlayerEntity targetPlayer = server.getPlayerManager().getPlayer(targetUUID);
+                    // Get the blockposition in a Vec3d
+                    Optional<BlockPos> blockPosOptional = this.context.get((w, blockPos) -> blockPos);
+                    BlockPos blockPos = blockPosOptional.get();
+                    Vec3d pos = blockPos.add(0, 1, 0).toCenterPos();
 
-                // Get the blockposition in a Vec3d
-                Optional<BlockPos> blockPosOptional = this.context.get((w, blockPos) -> blockPos);
-                BlockPos blockPos = blockPosOptional.get();
-                Vec3d pos = blockPos.add(0, 1, 0).toCenterPos();
+                    targetPlayer.teleport(world, pos.x, pos.y, pos.z, 0.0f, 0.0f);
+                    targetPlayer.changeGameMode(GameMode.SURVIVAL);
 
-                targetPlayer.teleport(world, pos.x, pos.y, pos.z, 0.0f, 0.0f);
-                targetPlayer.changeGameMode(GameMode.SURVIVAL);
+                    // Send a message to all players
+                    Text text = Text.literal((targetPlayer.getDisplayName().getString() + " was revived by " + player.getDisplayName().getString()));
+                    for (ServerPlayerEntity serverPlayer : server.getPlayerManager().getPlayerList()) {
+                        serverPlayer.sendMessage(text, false);
+                    }
 
-                // Send a message to all players
-                Text text = Text.literal((targetPlayer.getDisplayName().getString() + " was revived by " + player.getDisplayName().getString()));
-                for (ServerPlayerEntity serverPlayer : server.getPlayerManager().getPlayerList()) {
-                    serverPlayer.sendMessage(text, false);
-                }
+                    // Effects
+                    targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 4));
+                    targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 600, 0));
 
-                // Effects
-                targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 4));
-                targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 600, 0));
+                    // Play sound and create particles
+                    world.playSound(null, blockPos, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                    ParticleS2CPacket particlePacket = new ParticleS2CPacket(
+                            ParticleTypes.TOTEM_OF_UNDYING,
+                            false,
+                            pos.x,
+                            pos.y,
+                            pos.z,
+                            0.0f,
+                            0.0f,
+                            0.0f,
+                            0.5f,
+                            100
+                    );
 
-                // Play sound and create particles
-                world.playSound(null, blockPos, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
-                ParticleS2CPacket particlePacket = new ParticleS2CPacket(
-                        ParticleTypes.TOTEM_OF_UNDYING,
-                        false,
-                        pos.x,
-                        pos.y,
-                        pos.z,
-                        0.0f,
-                        0.0f,
-                        0.0f,
-                        0.5f,
-                        100
-                );
-
-                // Display Particles
-                for (ServerPlayerEntity serverPlayer : world.getPlayers()) {
-                    // Check if the player is close enough to see the particles
-                    if (player.squaredDistanceTo(new Vec3d(pos.x, pos.y, pos.z)) < 64.0) {
-                        serverPlayer.networkHandler.sendPacket(particlePacket);
+                    // Display Particles
+                    for (ServerPlayerEntity serverPlayer : world.getPlayers()) {
+                        // Check if the player is close enough to see the particles
+                        if (player.squaredDistanceTo(new Vec3d(pos.x, pos.y, pos.z)) < 64.0) {
+                            serverPlayer.networkHandler.sendPacket(particlePacket);
+                        }
                     }
                 }
             }
