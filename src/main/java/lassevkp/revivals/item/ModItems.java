@@ -13,8 +13,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ModItems {
-
-
     public static final Item RESURRECTION_TOTEM = registerItem("resurrection_totem", new Item(new FabricItemSettings().maxCount(1)));
 
     public static final ItemGroup MOD_GROUP = Registry.register(Registries.ITEM_GROUP,
@@ -26,7 +24,6 @@ public class ModItems {
                         entries.add(ModBlocks.RITUAL_TABLE);
                     }).build());
 
-
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registries.ITEM, new Identifier(Revivals.MOD_ID, name), item);
     }
@@ -34,7 +31,4 @@ public class ModItems {
     public static void registerModItems() {
         Revivals.LOGGER.info("Registering items for " + Revivals.MOD_ID);
     }
-
-
-
 }
