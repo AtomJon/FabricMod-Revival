@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BGB",
+    " E ",
+    "G G"
+  ],
+  "key": {
+    "B": {
+      "tag": "minecraft:light_blue_dye"
+    },
+    "E": {
+      "item": "minecraft:emerald"
+    },
+    "G": {
+      "item": "minecraft:gold"
+    }
+  },
+  "result": {
+    "item": "tutorial:custom_item",
+    "count": 4
+  }
+}
