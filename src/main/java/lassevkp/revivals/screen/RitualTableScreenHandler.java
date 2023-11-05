@@ -31,13 +31,11 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
 public class RitualTableScreenHandler extends ScreenHandler {
     private final Inventory inventory;
-    private final PropertyDelegate propertyDelegate;
     private final ScreenHandlerContext context;
     private Collection<UUID> deadplayers;
 
@@ -51,7 +49,6 @@ public class RitualTableScreenHandler extends ScreenHandler {
         checkSize(inventory, 1);
         this.inventory = inventory;
         inventory.onOpen(playerInventory.player);
-        this.propertyDelegate = delegate;
         this.context = context;
 
         this.addSlot(new Slot(inventory, 0, 120, 26));
@@ -65,10 +62,13 @@ public class RitualTableScreenHandler extends ScreenHandler {
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
+
         Slot slot = this.slots.get(invSlot);
         if (slot.hasStack() && slot.getStack().getItem() == ModItems.RESURRECTION_TOTEM) {
+
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
+
             if (invSlot < this.inventory.size()) {
                 if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
@@ -79,11 +79,12 @@ public class RitualTableScreenHandler extends ScreenHandler {
 
             if (originalStack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);
-
-            } else {
+            }
+            else {
                 slot.markDirty();
             }
         }
+
         return newStack;
     }
 
@@ -140,9 +141,8 @@ public class RitualTableScreenHandler extends ScreenHandler {
                 Optional<BlockPos> blockPosOptional = this.context.get((w, blockPos) -> blockPos);
                 BlockPos blockPos = blockPosOptional.get();
                 Vec3d pos = blockPos.add(0, 1, 0).toCenterPos();
+
                 targetPlayer.teleport(world, pos.x, pos.y, pos.z, 0.0f, 0.0f);
-
-
                 targetPlayer.changeGameMode(GameMode.SURVIVAL);
 
                 // Send a message to all players
@@ -154,7 +154,6 @@ public class RitualTableScreenHandler extends ScreenHandler {
                 // Effects
                 targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 4));
                 targetPlayer.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 600, 0));
-
 
                 // Play sound and create particles
                 world.playSound(null, blockPos, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -178,10 +177,7 @@ public class RitualTableScreenHandler extends ScreenHandler {
                         serverPlayer.networkHandler.sendPacket(particlePacket);
                     }
                 }
-
             }
-
         }
-
     }
 }
