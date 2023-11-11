@@ -46,7 +46,8 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
     protected void init() {
         super.init();
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
-        this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, 43, getMargin(-16, getCenterY(), this.height), 24);
+        this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, getMargin(-79, getCenterY(), this.height), getMargin(-16, getCenterY(), this.height), 24);
+
         this.resurrectButton = new ResurrectButtonWidget(getMargin(2, getCenterX(), this.height), getMargin(-30, getCenterY(), this.height),75,16,
                 new ButtonTextures(new Identifier(Revivals.MOD_ID, "container/ritual_table/button"),
                         new Identifier(Revivals.MOD_ID, "container/ritual_table/button_disabled"),

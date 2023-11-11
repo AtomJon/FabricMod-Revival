@@ -2,6 +2,7 @@ package lassevkp.revivals.screen;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
@@ -19,6 +20,8 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         this.setRenderBackground(false);
 
         this.deadPlayers = parent.getScreenHandler().getDeadPlayers();
+
+        this.setRenderHeader(false, 0);
 
         this.update(this.deadPlayers, 0.0);
     }
@@ -66,11 +69,6 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
     }
 
     @Override
-    protected int getRowTop(int index) {
-        return this.height/2-75+index*22;
-    }
-
-    @Override
     public int getRowLeft() {
         return this.left + this.width / 2 - this.getRowWidth()-5;
     }
@@ -83,11 +81,6 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
     @Override
     protected int getScrollbarPositionX() {
         return this.width / 2 - 96;
-    }
-
-    @Override
-    protected int getRowBottom(int index) {
-        return super.getRowBottom(index);
     }
 
     protected RitualTablePlayerListEntry getHoveredEntry(int mouseX, int mouseY){
@@ -111,5 +104,21 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
             this.update(this.deadPlayers, this.getScrollAmount());
         }
         return false;
+    }
+
+    @Override
+    protected void renderList(DrawContext context, int mouseX, int mouseY, float delta) {
+        int i = this.getRowLeft();
+        int j = this.getRowWidth();
+        int k = this.itemHeight - 4;
+        int l = this.getEntryCount();
+
+        for(int m = 0; m < l; ++m) {
+            int n = this.getRowTop(m);
+            int o = this.getRowBottom(m);
+            if (o >= this.top && n <= this.bottom) {
+                this.renderEntry(context, mouseX, mouseY, delta, m, i, n, j, k);
+            }
+        }
     }
 }
