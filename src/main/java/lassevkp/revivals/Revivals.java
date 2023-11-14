@@ -14,16 +14,34 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
+import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.scoreboard.ScoreboardPlayerScore;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.stat.Stats;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.event.GameEvent;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 public class Revivals implements ModInitializer {
 
@@ -38,7 +56,7 @@ public class Revivals implements ModInitializer {
 		ModBlockEntities.registerBlockEntities();
 		ModScreenHandlers.registerAllScreenHandlers();
 
-		LOGGER.info("Revivals is initialized! =D");
+		LOGGER.info("Initializing Revivals");
 
 		ServerLivingEntityEvents.ALLOW_DEATH.register(
 				Revivals::AllowDeathEventListener
@@ -55,14 +73,39 @@ public class Revivals implements ModInitializer {
 
         if (player.interactionManager.getGameMode() != GameMode.SURVIVAL) return true;
 
+		MinecraftServer server = player.getServer();
+		ServerWorld world = player.getServerWorld();
+		assert server != null;
+		assert world != null;
+
+		sendDeathMessage(player, world, server);
+
 		player.changeGameMode(GameMode.SPECTATOR);
 
-		LOGGER.info("Making this guy not die... ( ͡° ͜ʖ ͡°)");
 		resetPlayerHealth(entity);
 		makePlayerDropItems(entity, damageSource);
+		makePlayerDropShoulderEntities((PlayerEntity) player);
 
-		MinecraftServer server = player.getServer();
-		assert server != null;
+		if (world.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)){
+			forgivePlayerMobAnger(player);
+		}
+
+		player.getScoreboard().forEachScore(ScoreboardCriterion.DEATH_COUNT, player.getEntityName(), ScoreboardPlayerScore::incrementScore);
+
+		LivingEntity livingEntity = entity.getPrimeAdversary();
+		if(livingEntity != null){
+			incrementKilledByStat(player, damageSource, livingEntity);
+		}
+
+		world.sendEntityStatus(player, (byte) 3);
+		player.incrementStat(Stats.DEATHS);
+		player.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_DEATH));
+		player.resetStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST));
+		player.extinguish();
+		player.setFrozenTicks(0);
+		player.setOnFire(false);
+		player.getDamageTracker().update();
+		player.setLastDeathPos(Optional.of(GlobalPos.create(world.getRegistryKey(), player.getBlockPos())));
 
 		AddPlayerToDeadPlayers(player, server);
 
@@ -107,6 +150,60 @@ public class Revivals implements ModInitializer {
 			drop.invoke(entity, damageSource);
 		} catch (Exception e){
 			LOGGER.error(e.toString());
+		}
+	}
+
+	private static void incrementKilledByStat(ServerPlayerEntity entity, DamageSource damageSource, LivingEntity livingEntity) {
+		try {
+			Method onKilledBy = LivingEntity.class.getDeclaredMethod("onKilledBy", LivingEntity.class);
+			onKilledBy.setAccessible(true);
+			Field scoreAmount = LivingEntity.class.getDeclaredField("scoreAmount");
+			entity.incrementStat(Stats.KILLED_BY.getOrCreateStat(livingEntity.getType()));
+			livingEntity.updateKilledAdvancementCriterion(entity, scoreAmount.getInt(entity), damageSource);
+			onKilledBy.invoke(entity, livingEntity);
+		} catch (Exception e){
+			LOGGER.error(e.toString());
+		}
+	}
+
+	private static void forgivePlayerMobAnger(ServerPlayerEntity entity) {
+		try {
+			Method forgiveMobAnger = ServerPlayerEntity.class.getDeclaredMethod("forgiveMobAnger");
+			forgiveMobAnger.setAccessible(true);
+			forgiveMobAnger.invoke(entity);
+		} catch (Exception e){
+			LOGGER.error(e.toString());
+		}
+	}
+
+	private static void makePlayerDropShoulderEntities(PlayerEntity entity) {
+		try {
+			Method shoulderEntities = PlayerEntity.class.getDeclaredMethod("dropShoulderEntities");
+			shoulderEntities.setAccessible(true);
+			shoulderEntities.invoke(entity);
+		} catch (Exception e){
+			LOGGER.error(e.toString());
+		}
+	}
+
+	private static void sendDeathMessage(ServerPlayerEntity player, ServerWorld world, MinecraftServer server){
+		player.emitGameEvent(GameEvent.ENTITY_DIE);
+		boolean bl = world.getGameRules().getBoolean(GameRules.SHOW_DEATH_MESSAGES);
+		if (bl) {
+			Text text = player.getDamageTracker().getDeathMessage();
+
+			AbstractTeam abstractTeam = player.getScoreboardTeam();
+			if (abstractTeam != null && abstractTeam.getDeathMessageVisibilityRule() != AbstractTeam.VisibilityRule.ALWAYS) {
+				if (abstractTeam.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OTHER_TEAMS) {
+					server.getPlayerManager().sendToTeam(player, text);
+				} else if (abstractTeam.getDeathMessageVisibilityRule() == AbstractTeam.VisibilityRule.HIDE_FOR_OWN_TEAM) {
+					server.getPlayerManager().sendToOtherTeams(player, text);
+				}
+			} else {
+				server.getPlayerManager().broadcast(text, false);
+			}
+		} else {
+			player.networkHandler.sendPacket(new DeathMessageS2CPacket(player.getId(), ScreenTexts.EMPTY));
 		}
 	}
 

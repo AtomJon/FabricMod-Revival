@@ -3,11 +3,7 @@ package lassevkp.revivals.mixin.client;
 import lassevkp.revivals.Revivals;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import org.spongepowered.asm.mixin.Final;
@@ -16,7 +12,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.UUID;
@@ -49,16 +44,12 @@ public abstract class ClientPlayerEntityMixin {
             UUID deadPlayer = buf.readUuid();
             client.execute(() -> {
                 assert client.player != null;
-                client.player.sendMessage(Text.literal("Btw, this guy is dead: " + deadPlayer));
 
                 boolean clientPlayerIsDead = client.player.getUuid().equals(deadPlayer);
                 if (clientPlayerIsDead)
                 {
                     isDead = true;
                     positionOfDeath = client.player.getPos();
-
-                    client.player.sendMessage(Text.literal("Holy shit I'm dead!"));
-                    Revivals.LOGGER.info("Sooo.... apparently i died?");
                 }
             });
         });

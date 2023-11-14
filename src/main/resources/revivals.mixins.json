@@ -3,7 +3,6 @@
   "package": "lassevkp.revivals.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ServerPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
