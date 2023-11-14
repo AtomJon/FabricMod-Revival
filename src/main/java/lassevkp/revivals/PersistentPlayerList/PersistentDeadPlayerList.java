@@ -55,8 +55,7 @@ public class PersistentDeadPlayerList extends PersistentState {
     public static PersistentDeadPlayerList createFromNbt(NbtCompound tag) {
         byte[] data = tag.getByteArray(DeadPlayersNbtKey);
 
-        UUID[] deadPlayers = SerializationUtils.deserialize(data);
-        Collection<UUID> collectionDeadPlayers = List.of(deadPlayers);
+        Collection<UUID> collectionDeadPlayers = SerializationUtils.deserialize(data);
 
         PersistentDeadPlayerList state = new PersistentDeadPlayerList(collectionDeadPlayers);
         return state;
