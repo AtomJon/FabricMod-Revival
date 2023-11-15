@@ -3,16 +3,16 @@
 	"id": "revivals",
 	"version": "${version}",
 	"name": "Revivals",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Revive fallen comrades with the Revivals Minecraft mod",
 	"authors": [
 		"Lasse_VKP",
 		"AtomJon"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
+		"homepage": "https://neutronicworks.dk/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/revivals/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -37,6 +37,5 @@
 		"fabric-api": "*"
 	},
 	"suggests": {
-		"another-mod": "*"
 	}
 }
