@@ -1,0 +1,10 @@
+accessWidener v2 named
+
+# Fields
+accessible field net/minecraft/entity/LivingEntity scoreAmount I
+
+# Methods
+accessible method net/minecraft/server/network/ServerPlayerEntity forgiveMobAnger ()V
+accessible method net/minecraft/entity/player/PlayerEntity dropShoulderEntities ()V
+accessible method net/minecraft/entity/LivingEntity drop (Lnet/minecraft/entity/damage/DamageSource;)V
+accessible method net/minecraft/entity/LivingEntity onKilledBy (Lnet/minecraft/entity/LivingEntity;)V

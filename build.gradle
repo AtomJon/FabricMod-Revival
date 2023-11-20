@@ -94,6 +94,10 @@ jar {
 	}
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/revivals.accesswidener")
+}
+
 // configure the maven publication
 publishing {
 	publications {

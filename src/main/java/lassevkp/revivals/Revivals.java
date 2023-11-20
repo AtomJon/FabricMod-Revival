@@ -16,7 +16,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.scoreboard.ScoreboardCriterion;
@@ -27,15 +26,12 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.event.GameEvent;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,12 +78,12 @@ public class Revivals implements ModInitializer {
 
 		player.changeGameMode(GameMode.SPECTATOR);
 
-		resetPlayerHealth(entity);
-		makePlayerDropItems(entity, damageSource);
-		makePlayerDropShoulderEntities((PlayerEntity) player);
+		resetPlayerHealth(player);
+		player.drop(damageSource);
+		player.dropShoulderEntities();
 
 		if (world.getGameRules().getBoolean(GameRules.FORGIVE_DEAD_PLAYERS)){
-			forgivePlayerMobAnger(player);
+			player.forgiveMobAnger();
 		}
 
 		player.getScoreboard().forEachScore(ScoreboardCriterion.DEATH_COUNT, player.getEntityName(), ScoreboardPlayerScore::incrementScore);
@@ -116,7 +112,7 @@ public class Revivals implements ModInitializer {
 
 	private static void PlayerJoinedEventListener(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
 		ServerPlayerEntity player = handler.player;
-		LOGGER.info("A new player joined: " + player.getName());
+		LOGGER.info("A new player joined: " + player.getName().toString());
 
 		PersistentDeadPlayerList state = PersistentDeadPlayerList.getServerDeadPlayerList(server);
 		boolean playerIsDead = state.isPlayerUUIDDead(player.getUuid());
@@ -143,47 +139,9 @@ public class Revivals implements ModInitializer {
 		);
 	}
 
-	private static void makePlayerDropItems(LivingEntity entity, DamageSource damageSource) {
-		try {
-			Method drop = LivingEntity.class.getDeclaredMethod("drop", DamageSource.class);
-			drop.setAccessible(true);
-			drop.invoke(entity, damageSource);
-		} catch (Exception e){
-			LOGGER.error(e.toString());
-		}
-	}
-
 	private static void incrementKilledByStat(ServerPlayerEntity entity, DamageSource damageSource, LivingEntity livingEntity) {
-		try {
-			Method onKilledBy = LivingEntity.class.getDeclaredMethod("onKilledBy", LivingEntity.class);
-			onKilledBy.setAccessible(true);
-			Field scoreAmount = LivingEntity.class.getDeclaredField("scoreAmount");
-			entity.incrementStat(Stats.KILLED_BY.getOrCreateStat(livingEntity.getType()));
-			livingEntity.updateKilledAdvancementCriterion(entity, scoreAmount.getInt(entity), damageSource);
-			onKilledBy.invoke(entity, livingEntity);
-		} catch (Exception e){
-			LOGGER.error(e.toString());
-		}
-	}
-
-	private static void forgivePlayerMobAnger(ServerPlayerEntity entity) {
-		try {
-			Method forgiveMobAnger = ServerPlayerEntity.class.getDeclaredMethod("forgiveMobAnger");
-			forgiveMobAnger.setAccessible(true);
-			forgiveMobAnger.invoke(entity);
-		} catch (Exception e){
-			LOGGER.error(e.toString());
-		}
-	}
-
-	private static void makePlayerDropShoulderEntities(PlayerEntity entity) {
-		try {
-			Method shoulderEntities = PlayerEntity.class.getDeclaredMethod("dropShoulderEntities");
-			shoulderEntities.setAccessible(true);
-			shoulderEntities.invoke(entity);
-		} catch (Exception e){
-			LOGGER.error(e.toString());
-		}
+		livingEntity.updateKilledAdvancementCriterion(entity, entity.scoreAmount, damageSource);
+		entity.onKilledBy(livingEntity);
 	}
 
 	private static void sendDeathMessage(ServerPlayerEntity player, ServerWorld world, MinecraftServer server){
@@ -207,8 +165,10 @@ public class Revivals implements ModInitializer {
 		}
 	}
 
-	private static void resetPlayerHealth(LivingEntity entity) {
+	private static void resetPlayerHealth(PlayerEntity entity) {
 		entity.setHealth(20.0f);
+		entity.getHungerManager().setFoodLevel(20);
+		entity.getHungerManager().setSaturationLevel(20);
 		ServerPlayNetworking.registerGlobalReceiver(NetworkingConstants.RESURRECT_PACKET_ID, (server, player, handler, buf, responseSender) -> {
 			if(player.currentScreenHandler instanceof RitualTableScreenHandler){
 				RitualTableScreenHandler ritualTableScreenHandler = (RitualTableScreenHandler) player.currentScreenHandler;
