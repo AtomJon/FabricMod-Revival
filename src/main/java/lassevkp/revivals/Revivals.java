@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.scoreboard.AbstractTeam;
@@ -64,8 +65,8 @@ public class Revivals implements ModInitializer {
 	private static boolean AllowDeathEventListener(LivingEntity entity, DamageSource damageSource, float damageAmount) {
 		if (!(entity instanceof ServerPlayerEntity)) return true;
         ServerPlayerEntity player = (ServerPlayerEntity) entity;
-
         if (player.interactionManager.getGameMode() != GameMode.SURVIVAL) return true;
+		if (player.isHolding(Items.TOTEM_OF_UNDYING)) return true;
 
 		MinecraftServer server = player.getServer();
 		ServerWorld world = player.getServerWorld();
