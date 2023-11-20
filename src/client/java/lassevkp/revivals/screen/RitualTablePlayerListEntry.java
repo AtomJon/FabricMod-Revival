@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.math.ColorHelper;
 

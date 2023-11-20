@@ -27,16 +27,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.GameMode;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.event.GameEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Optional;
 
 public class Revivals implements ModInitializer {

@@ -8,7 +8,9 @@ import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.UUID;
 
 public class PersistentDeadPlayerList extends PersistentState {
     private static final String DeadPlayersNbtKey = "deadPlayers";
