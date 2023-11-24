@@ -6,7 +6,6 @@ import lassevkp.revivals.Revivals;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.player.PlayerInventory;
@@ -49,9 +48,7 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         this.playerList = new RitualTablePlayerListWidget(this, this.client, this.width, this.height, getMargin(-74, getCenterY(), this.height), getMargin(-16, getCenterY(), this.height), 24);
 
         this.resurrectButton = new ResurrectButtonWidget(getMargin(2, getCenterX(), this.height), getMargin(-30, getCenterY(), this.height),75,16,
-                new ButtonTextures(new Identifier(Revivals.MOD_ID, "container/ritual_table/button"),
-                        new Identifier(Revivals.MOD_ID, "container/ritual_table/button_disabled"),
-                        new Identifier(Revivals.MOD_ID, "container/ritual_table/button_highlighted")),
+                new Identifier(Revivals.MOD_ID, "container/ritual_table/button"),
                 button -> {
                     this.revive();
                 }, client);
@@ -71,7 +68,7 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
+        renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
         if(this.playerList != null){
             if (!this.playerList.isEmpty()) {
@@ -111,9 +108,10 @@ public class RitualTableScreen extends HandledScreen<RitualTableScreenHandler> {
         }
     }
 
+
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        this.playerList.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        this.playerList.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 }

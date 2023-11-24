@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.texture.PlayerSkinTexture;
 
 import java.util.*;
 
@@ -38,7 +39,7 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         for (UUID uUID : playerUuids) {
             PlayerListEntry playerListEntry = clientPlayNetworkHandler.getPlayerListEntry(uUID);
             if (playerListEntry == null) continue;
-            entriesByUuids.put(uUID, new RitualTablePlayerListEntry(this.client, this.parent, uUID, playerListEntry.getProfile().getName(), playerListEntry::getSkinTextures));
+            entriesByUuids.put(uUID, new RitualTablePlayerListEntry(this.client, this.parent, uUID, playerListEntry.getProfile().getName(), playerListEntry::getSkinTexture));
         }
     }
 
@@ -97,7 +98,7 @@ public class RitualTablePlayerListWidget extends ElementListWidget<RitualTablePl
         return null;
     }
 
-    @Override
+
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if(mouseY < this.bottom && mouseY >= this.top && mouseX >= this.getRowLeft() && mouseX < this.getRowRight()) {
             this.setScrollAmount(this.getScrollAmount()-verticalAmount*4);

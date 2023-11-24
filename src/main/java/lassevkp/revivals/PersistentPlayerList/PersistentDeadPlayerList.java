@@ -1,5 +1,6 @@
 package lassevkp.revivals.PersistentPlayerList;
 
+import com.mojang.datafixers.types.Type;
 import lassevkp.revivals.Revivals;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -63,12 +64,6 @@ public class PersistentDeadPlayerList extends PersistentState {
         return state;
     }
 
-    private static final Type<PersistentDeadPlayerList> type = new Type<>(
-            PersistentDeadPlayerList::new, // If there's no 'StateSaverAndLoader' yet create one
-            PersistentDeadPlayerList::createFromNbt, // If there is a 'StateSaverAndLoader' NBT, parse it with 'createFromNbt'
-            null // Supposed to be an 'DataFixTypes' enum, but we can just pass null
-    );
-
     public static PersistentDeadPlayerList getServerDeadPlayerList(MinecraftServer server) {
         PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
 
@@ -77,7 +72,7 @@ public class PersistentDeadPlayerList extends PersistentState {
             throw new AssertionError();
         }
 
-        PersistentDeadPlayerList state = persistentStateManager.getOrCreate(type, Revivals.MOD_ID);
+        PersistentDeadPlayerList state = persistentStateManager.getOrCreate(PersistentDeadPlayerList::createFromNbt, PersistentDeadPlayerList::new, Revivals.MOD_ID);
 
         return state;
     }

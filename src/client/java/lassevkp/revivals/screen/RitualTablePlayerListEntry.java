@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.client.util.SkinTextures;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
     private final UUID uuid;
     private final String name;
     private final RitualTableScreen parent;
-    private final Supplier<SkinTextures> skinSupplier;
+    private final Supplier<Identifier> skinSupplier;
     public static final int GRAY_COLOR = ColorHelper.Argb.getArgb((int)255, (int)74, (int)74, (int)74);
     public static final int LIGHT_GRAY_COLOR = ColorHelper.Argb.getArgb((int)140, (int)255, (int)255, (int)255);
     public static final int WHITE_COLOR = ColorHelper.Argb.getArgb((int)255, (int)255, (int)255, (int)255);
@@ -31,7 +31,7 @@ public class RitualTablePlayerListEntry extends ElementListWidget.Entry<RitualTa
     private int height;
     private int yOffset = 0;
 
-    public RitualTablePlayerListEntry(MinecraftClient client, RitualTableScreen parent, UUID uuid, String name, Supplier<SkinTextures> skinTexture){
+    public RitualTablePlayerListEntry(MinecraftClient client, RitualTableScreen parent, UUID uuid, String name, Supplier<Identifier> skinTexture){
         this.client = client;
         this.uuid = uuid;
         this.name = name;
