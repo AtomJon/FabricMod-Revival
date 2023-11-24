@@ -3,17 +3,20 @@
   "pattern": [
     "BGB",
     " E ",
-    "G G"
+    "GDG"
   ],
   "key": {
     "B": {
-      "item": "minecraft:light_blue_dye"
+      "item": "minecraft:lapis_lazuli"
     },
     "E": {
       "item": "minecraft:emerald"
     },
     "G": {
       "item": "minecraft:gold_ingot"
+    },
+    "D": {
+      "item": "minecraft:diamond"
     }
   },
   "result": {
